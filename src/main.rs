@@ -8,10 +8,10 @@ extern crate diesel;
 
 use serde::Serialize;
 
-pub mod models;
-pub mod handlers;
-pub mod schema;
 pub mod db_connection;
+pub mod handlers;
+pub mod models;
+pub mod schema;
 
 #[derive(Serialize)]
 struct Recipe {
@@ -22,9 +22,13 @@ fn main() {
     dotenv::dotenv().ok();
     rocket::ignite()
         .manage(db_connection::init_pool())
-        .mount("/", routes![
-            handlers::get_single_recipe, 
-            handlers::create_single_recipe,
-            handlers::update_single_recipe,
-        ]).launch();
+        .mount(
+            "/",
+            routes![
+                handlers::get_single_recipe,
+                handlers::create_single_recipe,
+                handlers::update_single_recipe,
+            ],
+        )
+        .launch();
 }
