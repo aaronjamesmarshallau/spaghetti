@@ -8,4 +8,5 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
+          default: true
       - run: cd src && cargo build --release --all-features
