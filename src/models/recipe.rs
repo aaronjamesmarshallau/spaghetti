@@ -1,6 +1,6 @@
-use diesel::{Queryable, PgConnection};
-use serde::{Serialize, Deserialize};
-use crate::schema::{recipe};
+use crate::schema::recipe;
+use diesel::{PgConnection, Queryable};
+use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Serialize, Deserialize)]
 pub struct ThinRecipe {
@@ -15,7 +15,15 @@ impl ThinRecipe {
         use diesel::QueryDsl;
         use diesel::RunQueryDsl;
 
-        recipe::table.find(id).select((recipe::id, recipe::name, recipe::description, recipe::image_url)).first(connection)
+        recipe::table
+            .find(id)
+            .select((
+                recipe::id,
+                recipe::name,
+                recipe::description,
+                recipe::image_url,
+            ))
+            .first(connection)
     }
 }
 
@@ -47,7 +55,10 @@ impl From<Recipe> for ThinRecipe {
 }
 
 impl Recipe {
-    pub fn create(rcp: &NewRecipe, connection: &PgConnection) -> Result<ThinRecipe, diesel::result::Error> {
+    pub fn create(
+        rcp: &NewRecipe,
+        connection: &PgConnection,
+    ) -> Result<ThinRecipe, diesel::result::Error> {
         use diesel::RunQueryDsl;
 
         diesel::insert_into(recipe::table)
@@ -56,16 +67,24 @@ impl Recipe {
             .map(Into::into)
     }
 
-    pub fn update(recipe_id: i32, recipe_data: &NewRecipe, connection: &PgConnection) -> Result<ThinRecipe, diesel::result::Error> {
-        use diesel::{QueryDsl, RunQueryDsl, ExpressionMethods};
+    pub fn update(
+        recipe_id: i32,
+        recipe_data: &NewRecipe,
+        connection: &PgConnection,
+    ) -> Result<ThinRecipe, diesel::result::Error> {
         use crate::schema::recipe::dsl::*;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 
         let recipe_name = &recipe_data.name;
         let recipe_description = &recipe_data.description;
         let recipe_image = &recipe_data.image_url;
 
         diesel::update(recipe.filter(id.eq(recipe_id)))
-            .set((name.eq(recipe_name), description.eq(recipe_description), image_url.eq(recipe_image)))
+            .set((
+                name.eq(recipe_name),
+                description.eq(recipe_description),
+                image_url.eq(recipe_image),
+            ))
             .get_result(connection)
     }
 }
