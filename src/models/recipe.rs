@@ -7,6 +7,7 @@ pub struct ThinRecipe {
     pub id: i32,
     pub name: String,
     pub description: String,
+    pub image_url: String,
 }
 
 impl ThinRecipe {
@@ -14,7 +15,7 @@ impl ThinRecipe {
         use diesel::QueryDsl;
         use diesel::RunQueryDsl;
 
-        recipe::table.find(id).select((recipe::id, recipe::name, recipe::description)).first(connection)
+        recipe::table.find(id).select((recipe::id, recipe::name, recipe::description, recipe::image_url)).first(connection)
     }
 }
 
@@ -40,6 +41,7 @@ impl From<Recipe> for ThinRecipe {
             id: rcp.id,
             name: rcp.name,
             description: rcp.description,
+            image_url: rcp.image_url,
         }
     }
 }
@@ -52,5 +54,18 @@ impl Recipe {
             .values(rcp)
             .get_result::<Recipe>(connection)
             .map(Into::into)
+    }
+
+    pub fn update(recipe_id: i32, recipe_data: &NewRecipe, connection: &PgConnection) -> Result<ThinRecipe, diesel::result::Error> {
+        use diesel::{QueryDsl, RunQueryDsl, ExpressionMethods};
+        use crate::schema::recipe::dsl::*;
+
+        let recipe_name = &recipe_data.name;
+        let recipe_description = &recipe_data.description;
+        let recipe_image = &recipe_data.image_url;
+
+        diesel::update(recipe.filter(id.eq(recipe_id)))
+            .set((name.eq(recipe_name), description.eq(recipe_description), image_url.eq(recipe_image)))
+            .get_result(connection)
     }
 }

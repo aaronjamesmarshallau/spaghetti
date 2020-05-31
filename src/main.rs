@@ -22,5 +22,9 @@ fn main() {
     dotenv::dotenv().ok();
     rocket::ignite()
         .manage(db_connection::init_pool())
-        .mount("/", routes![handlers::get_single_recipe, handlers::create_single_recipe]).launch();
+        .mount("/", routes![
+            handlers::get_single_recipe, 
+            handlers::create_single_recipe,
+            handlers::update_single_recipe,
+        ]).launch();
 }
