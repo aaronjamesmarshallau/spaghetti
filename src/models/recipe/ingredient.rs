@@ -20,6 +20,7 @@ pub struct RecipeIngredient {
     pub ingredient_id: i32,
     pub quantity: BigDecimal,
     pub unit: UnitOfMeasurement,
+    pub archived: bool,
 }
 
 #[derive(Queryable, Serialize, Deserialize)]
@@ -45,6 +46,7 @@ impl RecipeIngredient {
         recipe_ingredient
             .inner_join(ingredient::table)
             .filter(recipe_id.eq(rec_id))
+            .filter(archived.eq(false))
             .select((
                 id,
                 recipe_id,
@@ -110,6 +112,7 @@ pub struct Ingredient {
     pub name: String,
     pub description: String,
     pub image_url: String,
+    pub archived: bool,
 }
 
 impl Ingredient {

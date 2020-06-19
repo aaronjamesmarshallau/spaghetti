@@ -8,6 +8,7 @@ pub struct ThinRecipe {
     pub name: String,
     pub description: String,
     pub image_url: String,
+    pub archived: bool,
 }
 
 impl ThinRecipe {
@@ -22,6 +23,7 @@ impl ThinRecipe {
                 recipe::name,
                 recipe::description,
                 recipe::image_url,
+                recipe::archived,
             ))
             .first(connection)
     }
@@ -41,6 +43,7 @@ pub struct Recipe {
     pub name: String,
     pub description: String,
     pub image_url: String,
+    pub archived: bool,
 }
 
 impl From<Recipe> for ThinRecipe {
@@ -50,6 +53,7 @@ impl From<Recipe> for ThinRecipe {
             name: rcp.name,
             description: rcp.description,
             image_url: rcp.image_url,
+            archived: rcp.archived,
         }
     }
 }
