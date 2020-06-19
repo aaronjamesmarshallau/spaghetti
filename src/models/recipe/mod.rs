@@ -59,9 +59,10 @@ impl Recipe {
         rcp: &NewRecipe,
         connection: &PgConnection,
     ) -> Result<ThinRecipe, diesel::result::Error> {
+        use crate::schema::recipe::dsl::*;
         use diesel::RunQueryDsl;
 
-        diesel::insert_into(recipe::table)
+        diesel::insert_into(recipe)
             .values(rcp)
             .get_result::<Recipe>(connection)
             .map(Into::into)
@@ -88,3 +89,5 @@ impl Recipe {
             .get_result(connection)
     }
 }
+
+pub mod ingredient;
