@@ -92,6 +92,20 @@ impl Recipe {
             ))
             .get_result(connection)
     }
+
+    pub fn archive(
+        recipe_id: i32,
+        connection: &PgConnection
+    ) -> Result<ThinRecipe, diesel::result::Error> {
+        use crate::schema::recipe::dsl::*;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
+
+        diesel::update(recipe.filter(id.eq(recipe_id)))
+            .set(
+                archived.eq(true)
+            )
+            .get_result(connection)
+    }
 }
 
 pub mod ingredient;

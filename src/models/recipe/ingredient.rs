@@ -79,7 +79,6 @@ impl RecipeIngredient {
     }
 
     pub fn update(
-        rec_id: i32,
         rec_ing_id: i32,
         ingredient_data: &NewRecipeIngredient,
         connection: &PgConnection,
@@ -90,10 +89,23 @@ impl RecipeIngredient {
         diesel::update(recipe_ingredient.filter(id.eq(rec_ing_id)))
             .set((
                 ingredient_id.eq(ingredient_data.ingredient_id),
-                recipe_id.eq(rec_id),
                 quantity.eq(&ingredient_data.quantity),
                 unit.eq(&ingredient_data.unit),
             ))
+            .get_result(connection)
+    }
+
+    pub fn archive(
+        rec_ing_id: i32,
+        connection: &PgConnection
+    ) -> Result<RecipeIngredient, diesel::result::Error> {
+        use crate::schema::recipe_ingredient::dsl::*;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
+
+        diesel::update(recipe_ingredient.filter(id.eq(rec_ing_id)))
+            .set(
+                archived.eq(true)
+            )
             .get_result(connection)
     }
 }
@@ -128,6 +140,25 @@ impl Ingredient {
             .get_result(connection)
     }
 
+    pub fn find_one(
+        ingredient_id: i32, 
+        connection: &PgConnection
+    ) -> Result<Ingredient, diesel::result::Error> {
+        use crate::schema::ingredient::dsl::*;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
+
+        ingredient
+            .filter(id.eq(ingredient_id))
+            .select((
+                id,
+                name,
+                description,
+                image_url,
+                archived
+            ))
+            .first(connection)
+    }
+
     pub fn update(
         ingredient_id: i32,
         ingredient_data: &NewIngredient,
@@ -146,6 +177,20 @@ impl Ingredient {
                 description.eq(ingredient_description),
                 image_url.eq(ingredient_image.as_ref().ok_or("").unwrap()),
             ))
+            .get_result(connection)
+    }
+
+    pub fn archive(
+        ingredient_id: i32,
+        connection: &PgConnection
+    ) -> Result<Ingredient, diesel::result::Error> {
+        use crate::schema::ingredient::dsl::*;
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
+
+        diesel::update(ingredient.filter(id.eq(ingredient_id)))
+            .set(
+                archived.eq(true)
+            )
             .get_result(connection)
     }
 }
