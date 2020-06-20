@@ -1,0 +1,50 @@
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-container:
+    runs-on: ubuntu-latest
+    name: Create Container Image
+    steps:
+    - name: Checkout Source
+      uses: actions/checkout@v2
+    - name: Container Build
+      id: build
+      run: docker build . -t i18u/spaghetti
+    - name: Save Image
+      id: save
+      run: docker save i18u/spaghetti > spaghetti.tar
+    - name: Upload Artifact
+      id: upload
+      uses: actions/upload-artifact@master
+      with:
+        name: spaghetti
+        path: spaghetti.tar
+  push-to-latest:
+    needs: build-container
+    runs-on: ubuntu-latest
+    name: Push to Latest
+    steps:
+    - name: Download Artifact
+      id: download
+      uses: actions/download-artifact@master
+      with:
+        name: spaghetti
+        path: .
+    - name: Load Image
+      id: load
+      run: docker load --input spaghetti.tar
+    - name: Tag Image
+      id: tag
+      run: docker tag i18u/spaghetti i18u/spaghetti:latest
+    - name: Docker Login
+      id: login
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+      run: docker login -u $DOCKER_USER -p $DOCKER_TOKEN
+    - name: Push Image
+      id: push
+      run: docker push i18u/spaghetti:latest
