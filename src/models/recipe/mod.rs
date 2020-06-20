@@ -1,5 +1,5 @@
 use crate::schema::recipe;
-use diesel::{PgConnection, Queryable};
+use diesel::{PgConnection, Queryable, QueryDsl, RunQueryDsl, ExpressionMethods};
 use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Serialize, Deserialize)]
@@ -13,9 +13,6 @@ pub struct ThinRecipe {
 
 impl ThinRecipe {
     pub fn find(id: &i32, connection: &PgConnection) -> Result<ThinRecipe, diesel::result::Error> {
-        use diesel::QueryDsl;
-        use diesel::RunQueryDsl;
-
         recipe::table
             .find(id)
             .select((
@@ -64,7 +61,6 @@ impl Recipe {
         connection: &PgConnection,
     ) -> Result<ThinRecipe, diesel::result::Error> {
         use crate::schema::recipe::dsl::*;
-        use diesel::RunQueryDsl;
 
         diesel::insert_into(recipe)
             .values(rcp)
@@ -78,7 +74,6 @@ impl Recipe {
         connection: &PgConnection,
     ) -> Result<ThinRecipe, diesel::result::Error> {
         use crate::schema::recipe::dsl::*;
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 
         let recipe_name = &recipe_data.name;
         let recipe_description = &recipe_data.description;
@@ -98,7 +93,6 @@ impl Recipe {
         connection: &PgConnection
     ) -> Result<ThinRecipe, diesel::result::Error> {
         use crate::schema::recipe::dsl::*;
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 
         diesel::update(recipe.filter(id.eq(recipe_id)))
             .set(

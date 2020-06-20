@@ -2,7 +2,7 @@ use crate::conversion::units::UnitOfMeasurement;
 use crate::schema::ingredient;
 use crate::schema::recipe_ingredient;
 use bigdecimal::BigDecimal;
-use diesel::{PgConnection, Queryable};
+use diesel::{PgConnection, Queryable, ExpressionMethods, QueryDsl, RunQueryDsl};
 use serde::{Deserialize, Serialize};
 
 #[derive(Insertable, Serialize, Deserialize)]
@@ -41,7 +41,6 @@ impl RecipeIngredient {
         connection: &PgConnection,
     ) -> Result<Vec<ExpandedRecipeIngredient>, diesel::result::Error> {
         use crate::schema::recipe_ingredient::dsl::*;
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 
         recipe_ingredient
             .inner_join(ingredient::table)
@@ -66,7 +65,6 @@ impl RecipeIngredient {
         connection: &PgConnection,
     ) -> Result<RecipeIngredient, diesel::result::Error> {
         use crate::schema::recipe_ingredient::dsl::*;
-        use diesel::{ExpressionMethods, RunQueryDsl};
 
         diesel::insert_into(recipe_ingredient)
             .values((
@@ -84,7 +82,6 @@ impl RecipeIngredient {
         connection: &PgConnection,
     ) -> Result<RecipeIngredient, diesel::result::Error> {
         use crate::schema::recipe_ingredient::dsl::*;
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 
         diesel::update(recipe_ingredient.filter(id.eq(rec_ing_id)))
             .set((
@@ -100,7 +97,6 @@ impl RecipeIngredient {
         connection: &PgConnection
     ) -> Result<RecipeIngredient, diesel::result::Error> {
         use crate::schema::recipe_ingredient::dsl::*;
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 
         diesel::update(recipe_ingredient.filter(id.eq(rec_ing_id)))
             .set(
@@ -133,7 +129,6 @@ impl Ingredient {
         connection: &PgConnection,
     ) -> Result<Ingredient, diesel::result::Error> {
         use crate::schema::ingredient::dsl::*;
-        use diesel::RunQueryDsl;
 
         diesel::insert_into(ingredient)
             .values(new_ingredient)
@@ -145,7 +140,6 @@ impl Ingredient {
         connection: &PgConnection
     ) -> Result<Ingredient, diesel::result::Error> {
         use crate::schema::ingredient::dsl::*;
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 
         ingredient
             .filter(id.eq(ingredient_id))
@@ -165,7 +159,6 @@ impl Ingredient {
         connection: &PgConnection,
     ) -> Result<Ingredient, diesel::result::Error> {
         use crate::schema::ingredient::dsl::*;
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 
         let ingredient_name = &ingredient_data.name;
         let ingredient_description = &ingredient_data.description;
@@ -185,7 +178,6 @@ impl Ingredient {
         connection: &PgConnection
     ) -> Result<Ingredient, diesel::result::Error> {
         use crate::schema::ingredient::dsl::*;
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 
         diesel::update(ingredient.filter(id.eq(ingredient_id)))
             .set(
