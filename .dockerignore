@@ -1,0 +1,5 @@
+target/
+Dockerfile
+.editorconfig
+.env
+.github
