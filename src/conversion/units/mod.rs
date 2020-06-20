@@ -5,7 +5,7 @@ use diesel::sql_types::SmallInt;
 use diesel::types::ToSql;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug, AsExpression, FromSqlRow)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, AsExpression, FromSqlRow)]
 #[sql_type = "SmallInt"]
 pub enum UnitOfMeasurement {
     None,
