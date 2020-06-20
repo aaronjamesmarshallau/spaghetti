@@ -141,7 +141,7 @@ pub fn create_ingredient(
     new_ingredient: Json<NewIngredient>,
     connection: PostgresConnection,
 ) -> ApiResponse<Ingredient> {
-    let ingredient = new_ingredient.0;
+    let ingredient = new_ingredient.into_inner();
     let result = Ingredient::create(&ingredient, &connection);
 
     match result {
@@ -191,7 +191,7 @@ pub fn update_ingredient(
     ingredient_data: Json<NewIngredient>,
     connection: PostgresConnection,
 ) -> ApiResponse<Ingredient> {
-    let ingredient = ingredient_data.0;
+    let ingredient = ingredient_data.into_inner();
     let result = Ingredient::update(id, &ingredient, &connection);
 
     match result {

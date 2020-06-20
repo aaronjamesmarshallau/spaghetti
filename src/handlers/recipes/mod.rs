@@ -31,7 +31,7 @@ pub fn create_single_recipe(
     raw_recipe: Json<NewRecipe>,
     connection: PostgresConnection,
 ) -> ApiResponse<ThinRecipe> {
-    let recipe = raw_recipe.0;
+    let recipe = raw_recipe.into_inner();
     let result = Recipe::create(&recipe, &connection);
 
     match result {
@@ -59,7 +59,7 @@ pub fn update_single_recipe(
     raw_recipe: Json<NewRecipe>,
     connection: PostgresConnection,
 ) -> ApiResponse<ThinRecipe> {
-    let recipe_data = raw_recipe.0;
+    let recipe_data = raw_recipe.into_inner();
     let result = Recipe::update(id, &recipe_data, &connection);
 
     match result {
