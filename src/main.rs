@@ -21,27 +21,18 @@ use db_connection::Pool;
 
 embed_migrations!();
 
-fn run_db_migrations(rocket: Rocket) -> Result<Rocket, Rocket> {
+fn run_db_migrations(rocket: &Rocket) {
     let maybe_pool = rocket.state::<Pool>();
 
     match maybe_pool {
         Some(pool) => match pool.get() {
             Ok(conn) => match embedded_migrations::run(&conn) {
-                Ok(()) => Ok(rocket),
-                Err(e) => {
-                    println!("Failed to run database migrations: {}", e);
-                    Err(rocket)
-                }
+                Ok(()) => println!("Successfully ran database migrations."),
+                Err(e) => println!("Failed to run database migrations: {}", e)
             },
-            Err(e) => {
-                println!("Failed to get connection to run database migrations: {}", e);
-                Err(rocket)
-            },
+            Err(e) => println!("Failed to get connection to run database migrations: {}", e),
         },
-        None => {
-            println!("Failed to retrieve database pool for migration step");
-            Err(rocket)
-        }
+        None => println!("Failed to retrieve database pool for migration step"),
     }
 }
 
@@ -49,8 +40,8 @@ fn main() {
     dotenv::dotenv().ok();
 
     rocket::ignite()
-        .attach(AdHoc::on_attach("Database Migrations", run_db_migrations))
         .manage(db_connection::init_pool())
+        .attach(AdHoc::on_launch("Database Migrations", run_db_migrations))
         .mount(
             "/",
             routes![
