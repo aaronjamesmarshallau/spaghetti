@@ -5,7 +5,7 @@ use rocket::request::{self, FromRequest};
 use rocket::{Outcome, Request, State};
 use std::ops::Deref;
 
-type Pool = r2d2::Pool<r2d2::ConnectionManager<PgConnection>>;
+pub type Pool = r2d2::Pool<r2d2::ConnectionManager<PgConnection>>;
 
 fn get_database_url() -> String {
     dotenv::var("DATABASE_URL").expect("DATABASE_URL must be set")
