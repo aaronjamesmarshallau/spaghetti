@@ -11,7 +11,7 @@ pub fn get_single_recipe(id: i32, connection: PostgresConnection) -> ApiResponse
     match result {
         Ok(recipe) => ApiResponse {
             json: Json(Some(recipe)),
-            status: Status::Accepted,
+            status: Status::Ok,
         },
         Err(error) => {
             println!(
@@ -37,7 +37,7 @@ pub fn create_single_recipe(
     match result {
         Ok(recipe) => ApiResponse {
             json: Json(Some(recipe)),
-            status: Status::Accepted,
+            status: Status::Ok,
         },
         Err(error) => {
             println!(
@@ -65,7 +65,7 @@ pub fn update_single_recipe(
     match result {
         Ok(recipe) => ApiResponse {
             json: Json(Some(recipe)),
-            status: Status::Accepted,
+            status: Status::Ok,
         },
         Err(error) => {
             println!(
@@ -91,7 +91,7 @@ pub fn archive_single_recipe(
     match result {
         Ok(recipe) => ApiResponse {
             json: Json(Some(recipe)),
-            status: Status::Accepted
+            status: Status::Ok
         },
         Err(error) => {
             println!("Unable to archive recipe {}: {}", id, error);

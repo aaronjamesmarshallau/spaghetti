@@ -17,7 +17,7 @@ pub fn get_recipe_ingredients(
     match result {
         Ok(recipes) => ApiResponse {
             json: Json(Some(recipes.into_iter().map(Into::into).collect())),
-            status: Status::Accepted,
+            status: Status::Ok,
         },
         Err(err) => {
             println!(
@@ -48,7 +48,7 @@ pub fn create_recipe_ingredient(
     match result {
         Ok(recipe_ingredient) => ApiResponse {
             json: Json(Some(recipe_ingredient)),
-            status: Status::Accepted,
+            status: Status::Ok,
         },
         Err(error) => {
             println!(
@@ -83,7 +83,7 @@ pub fn update_recipe_ingredient(
     match result {
         Ok(recipe_ingredient) => ApiResponse {
             json: Json(Some(recipe_ingredient)),
-            status: Status::Accepted,
+            status: Status::Ok,
         },
         Err(error) => {
             println!(
@@ -115,7 +115,7 @@ pub fn archive_recipe_ingredient(
 
             ApiResponse {
                 json: Json(Some(op_res)),
-                status: Status::Accepted
+                status: Status::Ok
             }
         },
         Err(error) => {
@@ -147,7 +147,7 @@ pub fn create_ingredient(
     match result {
         Ok(ingredient) => ApiResponse {
             json: Json(Some(ingredient)),
-            status: Status::Accepted,
+            status: Status::Ok,
         },
         Err(error) => {
             println!(
@@ -172,7 +172,7 @@ pub fn get_single_ingredient(
     match result {
         Ok(ingredient) => ApiResponse {
             json: Json(Some(ingredient)),
-            status: Status::Accepted,
+            status: Status::Ok,
         },
         Err(error) => {
             println!("Unable to retrieve ingredient with id {}: {}", id, error);
@@ -197,7 +197,7 @@ pub fn update_ingredient(
     match result {
         Ok(ingredient) => ApiResponse {
             json: Json(Some(ingredient)),
-            status: Status::Accepted,
+            status: Status::Ok,
         },
         Err(error) => {
             println!("Failed to update ingredient {}: {}", id, error);
@@ -219,7 +219,7 @@ pub fn archive_ingredient(
     match result {
         Ok(ingredient) => ApiResponse {
             json: Json(Some(ingredient)),
-            status: Status::Accepted,
+            status: Status::Ok,
         },
         Err(error) => {
             println!("Unable to archive ingredient {}: {}", id, error);
