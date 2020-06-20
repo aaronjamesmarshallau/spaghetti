@@ -8,6 +8,7 @@ extern crate diesel;
 
 use serde::Serialize;
 
+pub mod conversion;
 pub mod db_connection;
 pub mod handlers;
 pub mod models;
@@ -25,9 +26,23 @@ fn main() {
         .mount(
             "/",
             routes![
-                handlers::get_single_recipe,
-                handlers::create_single_recipe,
-                handlers::update_single_recipe,
+                // Recipes
+                handlers::recipes::get_single_recipe,
+                handlers::recipes::create_single_recipe,
+                handlers::recipes::update_single_recipe,
+                handlers::recipes::archive_single_recipe,
+                
+                // Recipe Ingredients
+                handlers::ingredients::get_recipe_ingredients,
+                handlers::ingredients::create_recipe_ingredient,
+                handlers::ingredients::update_recipe_ingredient,
+                handlers::ingredients::archive_recipe_ingredient,
+
+                // Ingredients
+                handlers::ingredients::create_ingredient,
+                handlers::ingredients::get_single_ingredient,
+                handlers::ingredients::update_ingredient,
+                handlers::ingredients::archive_ingredient,
             ],
         )
         .launch();
