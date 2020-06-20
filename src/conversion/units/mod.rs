@@ -43,7 +43,7 @@ where
     where
         W: std::io::Write,
     {
-        i16::from(self).to_sql(out)
+        i16::from(*self).to_sql(out)
     }
 }
 
@@ -92,8 +92,8 @@ impl From<i16> for UnitOfMeasurement {
     }
 }
 
-impl From<&UnitOfMeasurement> for i16 {
-    fn from(unit: &UnitOfMeasurement) -> i16 {
+impl From<UnitOfMeasurement> for i16 {
+    fn from(unit: UnitOfMeasurement) -> i16 {
         match unit {
             // Units of Mass (Metric)
             UnitOfMeasurement::Milligrams => 1,
@@ -123,11 +123,5 @@ impl From<&UnitOfMeasurement> for i16 {
             // None
             _ => 0,
         }
-    }
-}
-
-impl From<UnitOfMeasurement> for i16 {
-    fn from(unit: UnitOfMeasurement) -> i16 {
-        *(&unit.into())
     }
 }
