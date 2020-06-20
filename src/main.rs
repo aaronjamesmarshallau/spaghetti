@@ -5,8 +5,8 @@ extern crate rocket;
 
 #[macro_use]
 extern crate diesel;
-
-use serde::Serialize;
+#[macro_use]
+extern crate diesel_migrations;
 
 pub mod conversion;
 pub mod db_connection;
@@ -14,14 +14,42 @@ pub mod handlers;
 pub mod models;
 pub mod schema;
 
-#[derive(Serialize)]
-struct Recipe {
-    id: i32,
+use rocket::Rocket;
+use rocket::fairing::AdHoc;
+
+use db_connection::Pool;
+
+embed_migrations!();
+
+fn run_db_migrations(rocket: Rocket) -> Result<Rocket, Rocket> {
+    let maybe_pool = rocket.state::<Pool>();
+
+    match maybe_pool {
+        Some(pool) => match pool.get() {
+            Ok(conn) => match embedded_migrations::run(&conn) {
+                Ok(()) => Ok(rocket),
+                Err(e) => {
+                    println!("Failed to run database migrations: {}", e);
+                    Err(rocket)
+                }
+            },
+            Err(e) => {
+                println!("Failed to get connection to run database migrations: {}", e);
+                Err(rocket)
+            },
+        },
+        None => {
+            println!("Failed to retrieve database pool for migration step");
+            Err(rocket)
+        }
+    }
 }
 
 fn main() {
     dotenv::dotenv().ok();
+
     rocket::ignite()
+        .attach(AdHoc::on_attach("Database Migrations", run_db_migrations))
         .manage(db_connection::init_pool())
         .mount(
             "/",
