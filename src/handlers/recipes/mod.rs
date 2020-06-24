@@ -4,6 +4,25 @@ use crate::models::transport::{ApiResponse};
 use rocket::http::Status;
 use rocket_contrib::json::Json;
 
+#[get("/api/recipe?<limit>&<offset>&<include_archived>")]
+pub fn get_recipes(limit: Option<i32>, offset: Option<i32>, include_archived: Option<bool>, connection: PostgresConnection) -> ApiResponse<Vec<ThinRecipe>> {
+    let result = ThinRecipe::find_many(limit, offset, include_archived, &connection);
+
+    match result {
+        Ok(recipes) => ApiResponse {
+            json: Json(Some(recipes)),
+            status: Status::Ok,
+        },
+        Err(error) => {
+            println!("Unable to query for recipes :: limit: {}, offset: {}, include_archived: {} :: {}", limit.unwrap_or(0), offset.unwrap_or(0), include_archived.unwrap_or(false), error);
+            ApiResponse {
+                json: Json(None.into()),
+                status: Status::Accepted
+            }
+        }
+    }
+}
+
 #[get("/api/recipe/<id>")]
 pub fn get_single_recipe(id: i32, connection: PostgresConnection) -> ApiResponse<ThinRecipe> {
     let result = ThinRecipe::find(&id, &connection);

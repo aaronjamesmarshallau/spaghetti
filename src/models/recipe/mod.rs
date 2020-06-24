@@ -11,16 +11,48 @@ pub struct ThinRecipe {
     pub archived: bool,
 }
 
+const DEFAULT_OFFSET: i32 = 0;
+const DEFAULT_LIMIT: i32 = 25;
+const DEFAULT_INCLUDE_ARCHIVED: bool = false;
+
 impl ThinRecipe {
-    pub fn find(id: &i32, connection: &PgConnection) -> Result<ThinRecipe, diesel::result::Error> {
-        recipe::table
-            .find(id)
+    pub fn find_many(offset: Option<i32>, limit: Option<i32>, include_archived: Option<bool>, connection: &PgConnection) -> Result<Vec<ThinRecipe>, diesel::result::Error> {
+        use crate::schema::recipe::dsl::*;
+
+        let offset_val = offset.unwrap_or(DEFAULT_OFFSET);
+        let limit_val = limit.unwrap_or(DEFAULT_LIMIT);
+        let include_archived_val = include_archived.unwrap_or(DEFAULT_INCLUDE_ARCHIVED);
+
+        let mut statement = recipe
             .select((
-                recipe::id,
-                recipe::name,
-                recipe::description,
-                recipe::image_url,
-                recipe::archived,
+                id,
+                name,
+                description,
+                image_url,
+                archived
+            ))
+            .offset(offset_val.into())
+            .limit(limit_val.into())
+            .into_boxed();
+
+        if !include_archived_val {
+            statement = statement.filter(archived.eq(false))
+        };
+
+        statement.get_results(connection)
+    }
+
+    pub fn find(recipe_id: &i32, connection: &PgConnection) -> Result<ThinRecipe, diesel::result::Error> {
+        use crate::schema::recipe::dsl::*;
+
+        recipe
+            .find(recipe_id)
+            .select((
+                id,
+                name,
+                description,
+                image_url,
+                archived,
             ))
             .first(connection)
     }
