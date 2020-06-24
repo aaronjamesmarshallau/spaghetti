@@ -12,17 +12,17 @@ pub struct ThinRecipe {
 }
 
 pub trait Clamped {
-    fn clamp(&self, lower_bound: i32, upper_bound: i32) -> Self;
-    fn clamp_lower(&self, lower_bound: i32) -> Self;
-    fn clamp_upper(&self, upper_bound: i32) -> Self;
+    fn clamp(&self, lower_bound: i64, upper_bound: i64) -> Self;
+    fn clamp_lower(&self, lower_bound: i64) -> Self;
+    fn clamp_upper(&self, upper_bound: i64) -> Self;
 }
 
-impl Clamped for i32 {
-    fn clamp(&self, lower_bound: i32, upper_bound: i32) -> i32 {
+impl Clamped for i64 {
+    fn clamp(&self, lower_bound: i64, upper_bound: i64) -> i64 {
         self.clamp_lower(lower_bound).clamp_upper(upper_bound)
     }
 
-    fn clamp_lower(&self, lower_bound: i32) -> i32 {
+    fn clamp_lower(&self, lower_bound: i64) -> i64 {
         if *self < lower_bound {
             lower_bound
         } else {
@@ -30,7 +30,7 @@ impl Clamped for i32 {
         }
     }
 
-    fn clamp_upper(&self, upper_bound: i32) -> i32 {
+    fn clamp_upper(&self, upper_bound: i64) -> i64 {
         if *self > upper_bound {
             upper_bound
         } else {
@@ -39,19 +39,19 @@ impl Clamped for i32 {
     }
 }
 
-const DEFAULT_OFFSET: i32 = 0;
-const DEFAULT_LIMIT: i32 = 25;
+const MAX_LIMIT: i64 = 200;
+const DEFAULT_OFFSET: i64 = 0;
+const DEFAULT_LIMIT: i64 = 25;
 const DEFAULT_INCLUDE_ARCHIVED: bool = false;
-const MAX_LIMIT: i32 = 200;
 
 impl ThinRecipe {
-    pub fn find_many(offset: Option<i32>, limit: Option<i32>, include_archived: Option<bool>, connection: &PgConnection) -> Result<Vec<ThinRecipe>, diesel::result::Error> {
+    pub fn find_many(offset: Option<i64>, limit: Option<i64>, include_archived: Option<bool>, connection: &PgConnection) -> Result<Vec<ThinRecipe>, diesel::result::Error> {
         use crate::schema::recipe::dsl::*;
 
         let offset_val = offset.unwrap_or(DEFAULT_OFFSET).clamp_lower(0);
         // annoying syntax because clamped is implemented as an unstable feature
         // https://doc.rust-lang.org/stable/rust-by-example/trait/disambiguating.html
-        let limit_val = <i32 as Clamped>::clamp(&limit.unwrap_or(DEFAULT_LIMIT), 0, MAX_LIMIT); 
+        let limit_val = <i64 as Clamped>::clamp(&limit.unwrap_or(DEFAULT_LIMIT), 0, MAX_LIMIT); 
         let include_archived_val = include_archived.unwrap_or(DEFAULT_INCLUDE_ARCHIVED);
 
         let mut statement = recipe

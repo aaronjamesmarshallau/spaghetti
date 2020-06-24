@@ -5,7 +5,7 @@ use rocket::http::Status;
 use rocket_contrib::json::Json;
 
 #[get("/api/recipe?<limit>&<offset>&<include_archived>")]
-pub fn get_recipes(limit: Option<i32>, offset: Option<i32>, include_archived: Option<bool>, connection: PostgresConnection) -> ApiResponse<Vec<ThinRecipe>> {
+pub fn get_recipes(limit: Option<i64>, offset: Option<i64>, include_archived: Option<bool>, connection: PostgresConnection) -> ApiResponse<Vec<ThinRecipe>> {
     let result = ThinRecipe::find_many(limit, offset, include_archived, &connection);
 
     match result {
