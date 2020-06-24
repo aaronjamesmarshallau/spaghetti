@@ -1,4 +1,5 @@
 use crate::schema::recipe;
+use crate::util::clamped::Clamped;
 use diesel::{PgConnection, Queryable, QueryDsl, RunQueryDsl, ExpressionMethods};
 use serde::{Deserialize, Serialize};
 
@@ -11,16 +12,51 @@ pub struct ThinRecipe {
     pub archived: bool,
 }
 
+const MAX_LIMIT: i64 = 200;
+const DEFAULT_OFFSET: i64 = 0;
+const DEFAULT_LIMIT: i64 = 25;
+const DEFAULT_INCLUDE_ARCHIVED: bool = false;
+
 impl ThinRecipe {
-    pub fn find(id: &i32, connection: &PgConnection) -> Result<ThinRecipe, diesel::result::Error> {
-        recipe::table
-            .find(id)
+    pub fn find_many(offset: Option<i64>, limit: Option<i64>, include_archived: Option<bool>, connection: &PgConnection) -> Result<Vec<ThinRecipe>, diesel::result::Error> {
+        use crate::schema::recipe::dsl::*;
+
+        let offset_val = offset.unwrap_or(DEFAULT_OFFSET).clamp_lower(0);
+        // annoying syntax because clamped is implemented as an unstable feature
+        // https://doc.rust-lang.org/stable/rust-by-example/trait/disambiguating.html
+        let limit_val = <i64 as Clamped>::clamp(&limit.unwrap_or(DEFAULT_LIMIT), 0, MAX_LIMIT); 
+        let include_archived_val = include_archived.unwrap_or(DEFAULT_INCLUDE_ARCHIVED);
+
+        let mut statement = recipe
             .select((
-                recipe::id,
-                recipe::name,
-                recipe::description,
-                recipe::image_url,
-                recipe::archived,
+                id,
+                name,
+                description,
+                image_url,
+                archived
+            ))
+            .offset(offset_val.into())
+            .limit(limit_val.into())
+            .into_boxed();
+
+        if !include_archived_val {
+            statement = statement.filter(archived.eq(false))
+        };
+
+        statement.get_results(connection)
+    }
+
+    pub fn find(recipe_id: &i32, connection: &PgConnection) -> Result<ThinRecipe, diesel::result::Error> {
+        use crate::schema::recipe::dsl::*;
+
+        recipe
+            .find(recipe_id)
+            .select((
+                id,
+                name,
+                description,
+                image_url,
+                archived,
             ))
             .first(connection)
     }
