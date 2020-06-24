@@ -11,16 +11,47 @@ pub struct ThinRecipe {
     pub archived: bool,
 }
 
+pub trait Clamped {
+    fn clamp(&self, lower_bound: i32, upper_bound: i32) -> Self;
+    fn clamp_lower(&self, lower_bound: i32) -> Self;
+    fn clamp_upper(&self, upper_bound: i32) -> Self;
+}
+
+impl Clamped for i32 {
+    fn clamp(&self, lower_bound: i32, upper_bound: i32) -> i32 {
+        self.clamp_lower(lower_bound).clamp_upper(upper_bound)
+    }
+
+    fn clamp_lower(&self, lower_bound: i32) -> i32 {
+        if *self < lower_bound {
+            lower_bound
+        } else {
+            *self
+        }
+    }
+
+    fn clamp_upper(&self, upper_bound: i32) -> i32 {
+        if *self > upper_bound {
+            upper_bound
+        } else {
+            *self
+        }
+    }
+}
+
 const DEFAULT_OFFSET: i32 = 0;
 const DEFAULT_LIMIT: i32 = 25;
 const DEFAULT_INCLUDE_ARCHIVED: bool = false;
+const MAX_LIMIT: i32 = 200;
 
 impl ThinRecipe {
     pub fn find_many(offset: Option<i32>, limit: Option<i32>, include_archived: Option<bool>, connection: &PgConnection) -> Result<Vec<ThinRecipe>, diesel::result::Error> {
         use crate::schema::recipe::dsl::*;
 
-        let offset_val = offset.unwrap_or(DEFAULT_OFFSET);
-        let limit_val = limit.unwrap_or(DEFAULT_LIMIT);
+        let offset_val = offset.unwrap_or(DEFAULT_OFFSET).clamp_lower(0);
+        // annoying syntax because clamped is implemented as an unstable feature
+        // https://doc.rust-lang.org/stable/rust-by-example/trait/disambiguating.html
+        let limit_val = <i32 as Clamped>::clamp(&limit.unwrap_or(DEFAULT_LIMIT), 0, MAX_LIMIT); 
         let include_archived_val = include_archived.unwrap_or(DEFAULT_INCLUDE_ARCHIVED);
 
         let mut statement = recipe
