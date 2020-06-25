@@ -48,6 +48,7 @@ fn main() {
             routes![
                 // Recipes
                 handlers::recipes::get_single_recipe,
+                handlers::recipes::get_recipes,
                 handlers::recipes::create_single_recipe,
                 handlers::recipes::update_single_recipe,
                 handlers::recipes::archive_single_recipe,
