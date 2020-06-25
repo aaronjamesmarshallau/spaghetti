@@ -1,3 +1,3 @@
-# spaghetti
+# 🍝 spaghetti
 
 boop
