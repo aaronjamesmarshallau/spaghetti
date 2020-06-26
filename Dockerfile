@@ -1,12 +1,15 @@
-FROM rustlang/rust:nightly
-
-RUN cargo install diesel_cli --no-default-features --features postgres
+FROM rustlang/rust:nightly AS build
 
 WORKDIR /app
 COPY . .
 
 RUN cargo build --release
 
-RUN ldd /app/target/release/spaghetti
+FROM debian:buster-slim
 
-CMD ["/app/target/release/spaghetti"]
+WORKDIR /app
+COPY --from=build /app/target/release/spaghetti .
+
+RUN apt-get update && apt-get install -y libpq-dev
+
+CMD ["/app/spaghetti"]
