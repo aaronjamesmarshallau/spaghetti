@@ -15,6 +15,7 @@ table! {
         description -> Varchar,
         image_url -> Varchar,
         archived -> Bool,
+        tags -> Array<Text>,
     }
 }
 

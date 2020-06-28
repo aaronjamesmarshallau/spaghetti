@@ -1,0 +1,19 @@
+version: '3'
+services:
+  spaghetti:
+    image: i18u/spaghetti
+    env_file:
+      - spaghetti.env
+    ports:
+      - "8000:8000"
+  postgres:
+    image: postgres:alpine
+    env_file:
+      - postgres.env
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+
+volumes:
+  database-data:
