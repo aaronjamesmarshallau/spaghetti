@@ -10,7 +10,6 @@ pub struct ThinRecipe {
     pub description: String,
     pub image_url: String,
     pub archived: bool,
-    pub tags: String[],
 }
 
 const MAX_LIMIT: i64 = 200;
@@ -35,7 +34,6 @@ impl ThinRecipe {
                 description,
                 image_url,
                 archived,
-                tags,
             ))
             .offset(offset_val.into())
             .limit(limit_val.into())
@@ -59,7 +57,6 @@ impl ThinRecipe {
                 description,
                 image_url,
                 archived,
-                tags
             ))
             .first(connection)
     }
@@ -80,7 +77,6 @@ pub struct Recipe {
     pub description: String,
     pub image_url: String,
     pub archived: bool,
-    pub tags: String[],
 }
 
 impl From<Recipe> for ThinRecipe {
@@ -91,7 +87,6 @@ impl From<Recipe> for ThinRecipe {
             description: rcp.description,
             image_url: rcp.image_url,
             archived: rcp.archived,
-            tags: rcp.tags,
         }
     }
 }
@@ -119,14 +114,12 @@ impl Recipe {
         let recipe_name = &recipe_data.name;
         let recipe_description = &recipe_data.description;
         let recipe_image = &recipe_data.image_url;
-        let recipe_tags = &recipe_data.tags,
 
         diesel::update(recipe.filter(id.eq(recipe_id)))
             .set((
                 name.eq(recipe_name),
                 description.eq(recipe_description),
                 image_url.eq(recipe_image),
-                tags.eq(recipe_tags),
             ))
             .get_result(connection)
     }
