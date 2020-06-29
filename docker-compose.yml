@@ -1,11 +1,5 @@
 version: '3'
 services:
-  spaghetti:
-    build: .
-    env_file:
-      - spaghetti.env
-    ports:
-      - "8000:8000"
   postgres:
     image: postgres:alpine
     env_file:
