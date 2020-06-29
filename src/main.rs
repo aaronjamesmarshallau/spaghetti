@@ -52,7 +52,7 @@ fn main() {
                 handlers::recipes::create_single_recipe,
                 handlers::recipes::update_single_recipe,
                 handlers::recipes::archive_single_recipe,
-                
+
                 // Recipe Ingredients
                 handlers::ingredients::get_recipe_ingredients,
                 handlers::ingredients::create_recipe_ingredient,
@@ -64,6 +64,14 @@ fn main() {
                 handlers::ingredients::get_single_ingredient,
                 handlers::ingredients::update_ingredient,
                 handlers::ingredients::archive_ingredient,
+
+                // Tags
+                handlers::tags::get_tags_for_recipe,
+                handlers::tags::save_recipe_tag,
+                handlers::tags::remove_recipe_tag,
+                handlers::tags::get_tags_for_ingredient,
+                handlers::tags::save_ingredient_tag,
+                handlers::tags::remove_ingredient_tag,
             ],
         )
         .launch();
