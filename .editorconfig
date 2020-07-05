@@ -1,2 +1,8 @@
 [*]
 insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.yml]
+tab_width = 2
+indent_size = tab
+indent_style = space

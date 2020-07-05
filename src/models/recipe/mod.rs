@@ -33,7 +33,7 @@ impl ThinRecipe {
                 name,
                 description,
                 image_url,
-                archived
+                archived,
             ))
             .offset(offset_val.into())
             .limit(limit_val.into())
